@@ -1,0 +1,17 @@
+{
+  "name": "pitangtrainee-backend",
+  "version": "1.0.0",
+  "main": "src/app.js",
+  "author": "Nayara Souza",
+  "license": "MIT",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "express": "^4.17.3"
+  }
+}
