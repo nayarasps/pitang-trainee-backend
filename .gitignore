@@ -147,6 +147,8 @@ dist
 
 # User-specific stuff
 .idea/
+coverage/
+yarn-error.log
 
 # CMake
 cmake-build-*/
