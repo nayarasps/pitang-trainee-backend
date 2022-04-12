@@ -1,12 +1,15 @@
+const express = require("express");
+const helmet = require('helmet');
+const routes = require("./routes/routes.js");
 
-const express = require('express')
 const app = express()
-const port = 3000
+const PORT = 8080;
 
-app.get('/', (req, res) => {
-    res.send('Hello World!')
-})
+app.use(express.json());
 
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`)
+app.use(helmet())
+app.use('/api',routes)
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`)
 })
