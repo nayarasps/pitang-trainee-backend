@@ -11,6 +11,13 @@ module.exports = class AgendamentoController {
 
         const pacientesPorDataAgendada = this.#getPacientesPorDataAgendada(dataAgendada);
 
+        const checaLimitePacientesPorDataAgendada = pacientesPorDataAgendada.length >= 20
+        if (checaLimitePacientesPorDataAgendada) {
+            response.status(405).json({Erro: "Numero de pacientes agendados excedidos para o dia"});
+            return;
+        }
+
+
         pacientesPorDataAgendada.push(paciente);
 
         this.agendamentos.set(dataAgendada, pacientesPorDataAgendada);
@@ -18,6 +25,7 @@ module.exports = class AgendamentoController {
 
         response.json({ message: "Agendamento Completo" });
     }
+
 
     #getPacientesPorDataAgendada(dataAgendada) {
         if (this.agendamentos.has(dataAgendada)) {
