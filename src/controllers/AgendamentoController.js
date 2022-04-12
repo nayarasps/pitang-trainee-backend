@@ -17,6 +17,10 @@ module.exports = class AgendamentoController {
             return;
         }
 
+        if (this.#LimiteDePacientesNoMesmoHorario(pacientesPorDataAgendada, horaAgendada)){
+            response.status(405).json({Erro: "Numero de pacientes agendados no mesmo horário excedidos"});
+            return;
+        }
 
         pacientesPorDataAgendada.push(paciente);
 
@@ -24,6 +28,14 @@ module.exports = class AgendamentoController {
         console.log(this.agendamentos)
 
         response.json({ message: "Agendamento Completo" });
+    }
+
+    #LimiteDePacientesNoMesmoHorario(pacientesPorDataAgendada, horaAgendada) {
+        let pacientesNaMesmaHora = 0
+        pacientesPorDataAgendada.filter(obj => {
+            if (obj.horaAgendada === horaAgendada) {pacientesNaMesmaHora++}
+        })
+        return pacientesNaMesmaHora >= 2;
     }
 
 
