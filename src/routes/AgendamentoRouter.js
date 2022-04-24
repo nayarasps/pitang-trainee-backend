@@ -8,6 +8,6 @@ const router = Router()
 
 router.post('/agendamentos', agendamentoMiddleware, agendamentoController.agendarPaciente.bind(agendamentoController));
 router.get('/agendamentos', agendamentoController.listarAgendamentosPorDataHora.bind(agendamentoController));
-router.patch('/agendamentos/:id', )
+router.patch('/agendamentos/:id', agendamentoController.mudarStatusAgendamento.bind(agendamentoController));
 
 module.exports = router;

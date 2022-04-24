@@ -17,6 +17,7 @@ module.exports = class AgendamentoController {
             return;
         }
 
+        // Checa o limite de pacientes por data e hora (max 2)
         const pacientesMesmaDataHora = this.#getPacientesMesmaDataHora(dataAgendada, horaAgendada)
         if (pacientesMesmaDataHora.length >= 2){
             response.status(405).json({mensagem: "Numero de pacientes agendados no mesmo horário excedidos"});
@@ -42,6 +43,21 @@ module.exports = class AgendamentoController {
         return response.status(200).json({ mensagem: "Agendamentos listados com sucesso", agendamentos: agendamentosOrdenados });
     }
 
+    async mudarStatusAgendamento(request, response) {
+        const id = request.params.id
+        const novoStatus = request.body.status;
+
+        const agendamento = this.agendamentos.filter(paciente => paciente.id === id)[0]
+
+        if (agendamento === null){
+            response.status(404).json({mensagem: "Agendamento não encontrado"});
+            return;
+        }
+
+        agendamento.setStatus(novoStatus);
+
+        return response.status(201).json({mensagem: "Status atualizado", agendamento: agendamento });
+    }
 
 
     #getPacientesPorDataAgendada(dataAgendada) {
