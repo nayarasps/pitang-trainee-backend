@@ -190,7 +190,44 @@ describe("GET /api/agendamentos", () => {
                 ]);
             })
     })
+})
 
+describe("PATCH /api/agendamentos/:id", () => {
+
+    it("Deve retornar um aviso de agendamento não encontrado", async () => {
+        await request(app)
+            .patch("/api/agendamentos/1")
+            .send({status: true})
+            .expect(404)
+            .then(response => {
+                expect(response.body.mensagem).toEqual("Agendamento não encontrado");
+            })
+
+    })
+
+    it("Deve retornar o agendamento com o status modificado", async () => {
+        let id = '';
+        await mockPost(1);
+        await request(app)
+            .get("/api/agendamentos")
+            .then(response => {
+                id = response.body.agendamentos[0].id})
+        await request(app)
+            .patch("/api/agendamentos/" + id)
+            .send({status: true})
+            .expect(201)
+            .then(response => {
+                expect(response.body.mensagem).toEqual("Status atualizado");
+                expect(response.body.agendamento).toEqual(
+                    {"dataAgendada": "13/04/2023",
+                        "dataNascimento": "14/10/1998",
+                        "horaAgendada": "01:00",
+                        "id": id,
+                        "nome": "Peter Parker",
+                        "status": true},
+                );
+            })
+    })
 })
 
 async function mockPost(quantidade = 1) {
