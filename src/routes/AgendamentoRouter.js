@@ -7,6 +7,6 @@ const agendamentoController = new AgendamentoController();
 const router = Router()
 
 router.use(agendamentoMiddleware)
-router.post('/agendamento', agendamentoController.agendarPaciente.bind(agendamentoController));
+router.post('/agendamentos', agendamentoController.agendarPaciente.bind(agendamentoController));
 
 module.exports = router;
