@@ -1,4 +1,5 @@
 const PacienteModel = require("../models/PacienteModel.js");
+const moment = require("moment");
 
 module.exports = class AgendamentoController {
 
@@ -27,21 +28,20 @@ module.exports = class AgendamentoController {
         response.status(201).json({ mensagem: "Agendamento Completo", agendamento: paciente});
     }
 
-    async listarAgendamentos(request, response) {
+    async listarAgendamentosPorDataHora(request, response) {
 
-        const agendamentosMap = new Map(
-            this.agendamentos.map(paciente => {
-                const key = paciente.dataAgendada + ' ' + paciente.horaAgendada;
-                const pacienteMesmaDataHora = this.#getPacientesMesmaDataHora(paciente.dataAgendada, paciente.horaAgendada)
-                return [key, pacienteMesmaDataHora]
-            })
-        )
+        let agendamentosOrdenados = this.agendamentos.sort(function (a, b) {
+            const dataA = moment(a.dataAgendada + ' ' + a.horaAgendada, 'DD/MM/YYYY HH:mm').toDate()
+            const dataB = moment(b.dataAgendada + ' ' + b.horaAgendada, 'DD/MM/YYYY HH:mm').toDate()
+            return dataA > dataB ? 1 : -1;
+        });
 
-        if(agendamentosMap.size === 0) {
+        if(this.agendamentos.length === 0) {
             return response.status(200).json({ mensagem: "Nenhum agendamento cadastrado"});
         }
-        return response.status(200).json({ mensagem: "Agendamentos listados com sucesso", agendamentos: [...agendamentosMap] });
+        return response.status(200).json({ mensagem: "Agendamentos listados com sucesso", agendamentos: agendamentosOrdenados });
     }
+
 
 
     #getPacientesPorDataAgendada(dataAgendada) {

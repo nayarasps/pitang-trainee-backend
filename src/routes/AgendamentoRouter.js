@@ -7,7 +7,7 @@ const agendamentoController = new AgendamentoController();
 const router = Router()
 
 router.post('/agendamentos', agendamentoMiddleware, agendamentoController.agendarPaciente.bind(agendamentoController));
-router.get('/agendamentos', agendamentoController.listarAgendamentos.bind(agendamentoController));
+router.get('/agendamentos', agendamentoController.listarAgendamentosPorDataHora.bind(agendamentoController));
 router.patch('/agendamentos/:id', )
 
 module.exports = router;

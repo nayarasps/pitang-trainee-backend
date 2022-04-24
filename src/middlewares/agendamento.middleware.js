@@ -17,15 +17,30 @@ function agendamentoMiddleware (request, response, next) {
         return
     }
 
+    if(!moment(dataNascimento, 'DD/MM/YYYY').isValid()){
+        response.status(422).json({ mensagem : "A data de nascimento é inválida!"})
+        return
+    }
+
     // Checagem data de agendada não vazia
     if(!dataAgendada){
         response.status(422).json({ mensagem : "A data agendada é obrigatória!"})
         return
     }
 
+    if(!moment(dataAgendada, 'DD/MM/YYYY').isValid()){
+        response.status(422).json({ mensagem : "A data agendada é inválida!"})
+        return
+    }
+
     // Checagem hora agendada não vazia
     if(!horaAgendada){
         response.status(422).json({ mensagem : "A hora agendada é obrigatória!"})
+        return
+    }
+
+    if(!moment(horaAgendada, 'HH:mm').isValid()){
+        response.status(422).json({ mensagem : "A hora agendada é inválida!"})
         return
     }
 

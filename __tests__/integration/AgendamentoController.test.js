@@ -133,20 +133,28 @@ describe("GET /api/agendamentos", () => {
     })
 
     it("Deve retornar a lista com data hora e paciente", async () => {
-        await mockPost(1);
+        await mockPost(2);
         await request(app)
             .get("/api/agendamentos")
             .expect(200)
             .then(response => {
                 expect(response.body.mensagem).toEqual("Agendamentos listados com sucesso");
-                response.body.agendamentos[0][1][0].id = "1";
-                expect(response.body.agendamentos).toEqual([["13/04/2023 01:00", [{
-                    "dataAgendada": "13/04/2023",
+                response.body.agendamentos[0].id = "1";
+                response.body.agendamentos[1].id = "2";
+                expect(response.body.agendamentos).toEqual([
+                    {"dataAgendada": "13/04/2023",
                     "dataNascimento": "14/10/1998",
                     "horaAgendada": "01:00",
                     "id": "1",
                     "nome": "Peter Parker",
-                    "status": false}]]]);
+                    "status": false},
+                    {"dataAgendada": "13/04/2023",
+                        "dataNascimento": "14/10/1998",
+                        "horaAgendada": "02:00",
+                        "id": "2",
+                        "nome": "Peter Parker",
+                        "status": false},
+                ]);
             })
     })
 
