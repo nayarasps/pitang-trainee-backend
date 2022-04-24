@@ -6,6 +6,7 @@ let paciente;
 
 beforeEach(async () => {
     paciente = {
+        id: "1",
         nome:"Peter Parker",
         dataNascimento:"14/10/1998",
         dataAgendada:"13/04/2023",
@@ -80,6 +81,7 @@ describe("POST /api/agendamentos", () => {
             .send(paciente)
             .expect(201)
             .then(response => {
+                response.body.agendamento.id = "1";
                 expect(response.body.mensagem).toEqual("Agendamento Completo");
                 expect(response.body.agendamento).toEqual(paciente)
             })
