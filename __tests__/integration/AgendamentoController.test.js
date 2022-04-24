@@ -44,6 +44,17 @@ describe("MIDDLEWARE - POST /api/agendamentos", () => {
             })
     })
 
+    it("Verifica se a data de nascimento é válida", async () => {
+        paciente.dataNascimento = '32/01/1998'
+        await request(app)
+            .post("/api/agendamentos")
+            .send(paciente)
+            .expect(422)
+            .then(response => {
+                expect(response.body.mensagem).toEqual("A data de nascimento é inválida!")
+            })
+    })
+
     it("Verifica se um paciente sem data agendada não é cadastrado", async () => {
         paciente.dataAgendada = ''
         await request(app)
@@ -55,6 +66,17 @@ describe("MIDDLEWARE - POST /api/agendamentos", () => {
             })
     })
 
+    it("Verifica se a data agendada é válida", async () => {
+        paciente.dataAgendada = '32/01/2022'
+        await request(app)
+            .post("/api/agendamentos")
+            .send(paciente)
+            .expect(422)
+            .then(response => {
+                expect(response.body.mensagem).toEqual("A data agendada é inválida!")
+            })
+    })
+
     it("Verifica se um paciente sem hora agendada não é cadastrado", async () => {
         paciente.horaAgendada = ''
         await request(app)
@@ -63,6 +85,17 @@ describe("MIDDLEWARE - POST /api/agendamentos", () => {
             .expect(422)
             .then(response => {
                 expect(response.body.mensagem).toEqual("A hora agendada é obrigatória!")
+            })
+    })
+
+    it("Verifica se a hora agendada é válida", async () => {
+        paciente.horaAgendada = '32:00'
+        await request(app)
+            .post("/api/agendamentos")
+            .send(paciente)
+            .expect(422)
+            .then(response => {
+                expect(response.body.mensagem).toEqual("A hora agendada é inválida!")
             })
     })
 
