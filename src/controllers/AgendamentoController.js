@@ -29,6 +29,10 @@ module.exports = class AgendamentoController {
         response.status(201).json({ mensagem: "Agendamento Completo", agendamento: paciente});
     }
 
+    async listarPacientes(request, response) {
+
+    }
+
 
 }
 
