@@ -11,10 +11,6 @@ class PacienteModel {
         this.status = false;
     }
 
-    setStatus(novoStatus) {
-        this.status = novoStatus;
-    }
-
 }
 
 module.exports = PacienteModel;

@@ -49,12 +49,12 @@ module.exports = class AgendamentoController {
 
         const agendamento = this.agendamentos.filter(paciente => paciente.id === id)[0]
 
-        if (agendamento === null){
+        if (agendamento === undefined){
             response.status(404).json({mensagem: "Agendamento não encontrado"});
             return;
         }
 
-        agendamento.setStatus(novoStatus);
+        agendamento.status = novoStatus;
 
         return response.status(201).json({mensagem: "Status atualizado", agendamento: agendamento });
     }
