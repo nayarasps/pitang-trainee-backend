@@ -10,16 +10,14 @@ module.exports = class AgendamentoController {
         const paciente = new PacienteModel(nome, dataNascimento, dataAgendada, horaAgendada);
 
         // Checa o limite de pacientes por data (max 20)
-        const pacientesPorDataAgendada =
-            this.agendamentos.filter(paciente => paciente.dataAgendada === dataAgendada);
+        const pacientesPorDataAgendada = this.#getPacientesPorDataAgendada(dataAgendada);
         if (pacientesPorDataAgendada.length >= 20) {
             response.status(405).json({mensagem: "Numero de pacientes agendados excedidos para o dia"});
             return;
         }
 
-        const pacientesMesmaDataMesmoHorario =
-            pacientesPorDataAgendada.filter(paciente => paciente.horaAgendada === horaAgendada)
-        if (pacientesMesmaDataMesmoHorario.length >= 2){
+        const pacientesMesmaDataHora = this.#getPacientesMesmaDataHora(dataAgendada, horaAgendada)
+        if (pacientesMesmaDataHora.length >= 2){
             response.status(405).json({mensagem: "Numero de pacientes agendados no mesmo horário excedidos"});
             return;
         }
@@ -29,11 +27,31 @@ module.exports = class AgendamentoController {
         response.status(201).json({ mensagem: "Agendamento Completo", agendamento: paciente});
     }
 
-    async listarPacientes(request, response) {
+    async listarAgendamentos(request, response) {
 
+        const agendamentosMap = new Map(
+            this.agendamentos.map(paciente => {
+                const key = paciente.dataAgendada + ' ' + paciente.horaAgendada;
+                const pacienteMesmaDataHora = this.#getPacientesMesmaDataHora(paciente.dataAgendada, paciente.horaAgendada)
+                return [key, pacienteMesmaDataHora]
+            })
+        )
+
+        if(agendamentosMap.size === 0) {
+            return response.status(200).json({ mensagem: "Nenhum agendamento cadastrado"});
+        }
+        return response.status(200).json({ mensagem: "Agendamentos Listados", agendamentos: [...agendamentosMap] });
     }
 
 
+    #getPacientesPorDataAgendada(dataAgendada) {
+        return this.agendamentos.filter(paciente => paciente.dataAgendada === dataAgendada);
+    }
+
+    #getPacientesMesmaDataHora(dataAgendada, horaAgendada) {
+        const pacientesPorDataAgendada = this.#getPacientesPorDataAgendada(dataAgendada);
+        return pacientesPorDataAgendada.filter(paciente => paciente.horaAgendada === horaAgendada)
+    }
 }
 
 
