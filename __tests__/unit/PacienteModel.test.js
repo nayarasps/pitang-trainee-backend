@@ -1,7 +1,7 @@
 const PacienteModel = require("../../src/models/PacienteModel");
 
 describe('Testar o Objeto Paciente', () => {
-    test('Criar o Paciente corretamente', () => {
+    it('Criar o Paciente corretamente', () => {
         const antonio = new PacienteModel("Antonio", "13/01/1998", "22/05/2022", "12:00")
 
         const pacienteAntonio =
@@ -14,7 +14,7 @@ describe('Testar o Objeto Paciente', () => {
         expect(antonio).toEqual(pacienteAntonio)
     });
 
-    test('Mudar o status do Paciente corretamente', () => {
+    it('Mudar o status do Paciente corretamente', () => {
         const antonio = new PacienteModel("Antonio", "13/01/1998", "22/05/2022", "12:00")
 
         antonio.setStatus(true)
