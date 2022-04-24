@@ -40,7 +40,7 @@ module.exports = class AgendamentoController {
         if(agendamentosMap.size === 0) {
             return response.status(200).json({ mensagem: "Nenhum agendamento cadastrado"});
         }
-        return response.status(200).json({ mensagem: "Agendamentos Listados", agendamentos: [...agendamentosMap] });
+        return response.status(200).json({ mensagem: "Agendamentos listados com sucesso", agendamentos: [...agendamentosMap] });
     }
 
 

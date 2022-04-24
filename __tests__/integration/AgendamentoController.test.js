@@ -1,5 +1,5 @@
 const request = require("supertest");
-const app = require("../../src/app");
+let app = require("../../src/app");
 const moment = require("moment");
 
 let paciente;
@@ -13,6 +13,12 @@ beforeEach(async () => {
         horaAgendada:"00:00",
         status: false}
 })
+
+afterEach(async () => {
+    app = require("../../src/app");
+    jest.resetAllMocks();
+    jest.resetModules();
+});
 
 
 describe("MIDDLEWARE - POST /api/agendamentos", () => {
@@ -74,7 +80,6 @@ describe("MIDDLEWARE - POST /api/agendamentos", () => {
 
 describe("POST /api/agendamentos", () => {
 
-    //TODO melhorar esse teste, retornar o corpo do objeto talvez?
     it("Deve agendar um paciente no horário e data fornecidos", async () => {
         await request(app)
             .post("/api/agendamentos")
@@ -112,6 +117,39 @@ describe("POST /api/agendamentos", () => {
             })
     })
 
+
+
+})
+
+describe("GET /api/agendamentos", () => {
+
+    it("Deve retornar um aviso de agenda vazia", async () => {
+        await request(app)
+            .get("/api/agendamentos")
+            .expect(200)
+            .then(response => {
+                expect(response.body.mensagem).toEqual("Nenhum agendamento cadastrado");
+            })
+    })
+
+    it("Deve retornar a lista com data hora e paciente", async () => {
+        await mockPost(1);
+        await request(app)
+            .get("/api/agendamentos")
+            .expect(200)
+            .then(response => {
+                expect(response.body.mensagem).toEqual("Agendamentos listados com sucesso");
+                response.body.agendamentos[0][1][0].id = "1";
+                expect(response.body.agendamentos).toEqual([["13/04/2023 01:00", [{
+                    "dataAgendada": "13/04/2023",
+                    "dataNascimento": "14/10/1998",
+                    "horaAgendada": "01:00",
+                    "id": "1",
+                    "nome": "Peter Parker",
+                    "status": false}]]]);
+            })
+    })
+
 })
 
 async function mockPost(quantidade = 1) {
@@ -120,6 +158,7 @@ async function mockPost(quantidade = 1) {
         paciente.horaAgendada = moment(paciente.horaAgendada, 'HH:mm')
                                  .add(1, 'h')
                                  .format("HH:mm")
+
 
         await request(app)
             .post("/api/agendamentos")
