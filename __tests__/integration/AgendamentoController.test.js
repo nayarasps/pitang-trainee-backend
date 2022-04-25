@@ -1,17 +1,24 @@
 const request = require("supertest");
-const app = require("../../src/app");
+let app = require("../../src/app");
 const moment = require("moment");
 
 let paciente;
 
 beforeEach(async () => {
     paciente = {
+        id: "1",
         nome:"Peter Parker",
         dataNascimento:"14/10/1998",
         dataAgendada:"13/04/2023",
         horaAgendada:"00:00",
         status: false}
 })
+
+afterEach(async () => {
+    app = require("../../src/app");
+    jest.resetAllMocks();
+    jest.resetModules();
+});
 
 
 describe("MIDDLEWARE - POST /api/agendamentos", () => {
@@ -37,6 +44,17 @@ describe("MIDDLEWARE - POST /api/agendamentos", () => {
             })
     })
 
+    it("Verifica se a data de nascimento é válida", async () => {
+        paciente.dataNascimento = '32/01/1998'
+        await request(app)
+            .post("/api/agendamentos")
+            .send(paciente)
+            .expect(422)
+            .then(response => {
+                expect(response.body.mensagem).toEqual("A data de nascimento é inválida!")
+            })
+    })
+
     it("Verifica se um paciente sem data agendada não é cadastrado", async () => {
         paciente.dataAgendada = ''
         await request(app)
@@ -48,6 +66,17 @@ describe("MIDDLEWARE - POST /api/agendamentos", () => {
             })
     })
 
+    it("Verifica se a data agendada é válida", async () => {
+        paciente.dataAgendada = '32/01/2022'
+        await request(app)
+            .post("/api/agendamentos")
+            .send(paciente)
+            .expect(422)
+            .then(response => {
+                expect(response.body.mensagem).toEqual("A data agendada é inválida!")
+            })
+    })
+
     it("Verifica se um paciente sem hora agendada não é cadastrado", async () => {
         paciente.horaAgendada = ''
         await request(app)
@@ -56,6 +85,17 @@ describe("MIDDLEWARE - POST /api/agendamentos", () => {
             .expect(422)
             .then(response => {
                 expect(response.body.mensagem).toEqual("A hora agendada é obrigatória!")
+            })
+    })
+
+    it("Verifica se a hora agendada é válida", async () => {
+        paciente.horaAgendada = '32:00'
+        await request(app)
+            .post("/api/agendamentos")
+            .send(paciente)
+            .expect(422)
+            .then(response => {
+                expect(response.body.mensagem).toEqual("A hora agendada é inválida!")
             })
     })
 
@@ -73,13 +113,13 @@ describe("MIDDLEWARE - POST /api/agendamentos", () => {
 
 describe("POST /api/agendamentos", () => {
 
-    //TODO melhorar esse teste, retornar o corpo do objeto talvez?
     it("Deve agendar um paciente no horário e data fornecidos", async () => {
         await request(app)
             .post("/api/agendamentos")
             .send(paciente)
             .expect(201)
             .then(response => {
+                response.body.agendamento.id = "1";
                 expect(response.body.mensagem).toEqual("Agendamento Completo");
                 expect(response.body.agendamento).toEqual(paciente)
             })
@@ -110,6 +150,92 @@ describe("POST /api/agendamentos", () => {
             })
     })
 
+
+
+})
+
+describe("GET /api/agendamentos", () => {
+
+    it("Deve retornar um aviso de agenda vazia", async () => {
+        await request(app)
+            .get("/api/agendamentos")
+            .expect(200)
+            .then(response => {
+                expect(response.body.mensagem).toEqual("Nenhum agendamento cadastrado");
+            })
+    })
+
+    it("Deve retornar a lista com data hora e paciente", async () => {
+        await mockPost(2);
+        await request(app)
+            .get("/api/agendamentos")
+            .expect(200)
+            .then(response => {
+                expect(response.body.mensagem).toEqual("Agendamentos listados com sucesso");
+                response.body.agendamentos["13/04/2023 01:00"][0].id = "1";
+                response.body.agendamentos["13/04/2023 02:00"][0].id = "2";
+                expect(response.body.agendamentos).toEqual({
+                    "13/04/2023 01:00": [
+                        {
+                            "dataAgendada": "13/04/2023",
+                            "dataNascimento": "14/10/1998",
+                            "horaAgendada": "01:00",
+                            "id": "1",
+                            "nome": "Peter Parker",
+                            "status": false
+                        }
+                    ],
+                    "13/04/2023 02:00": [
+                        {
+                            "dataAgendada": "13/04/2023",
+                            "dataNascimento": "14/10/1998",
+                            "horaAgendada": "02:00",
+                            "id": "2",
+                            "nome": "Peter Parker",
+                            "status": false
+                        }
+                    ]
+                });
+            })
+    })
+})
+
+describe("PATCH /api/agendamentos/:id", () => {
+
+    it("Deve retornar um aviso de agendamento não encontrado", async () => {
+        await request(app)
+            .patch("/api/agendamentos/1")
+            .send({status: true})
+            .expect(404)
+            .then(response => {
+                expect(response.body.mensagem).toEqual("Agendamento não encontrado");
+            })
+
+    })
+
+    it("Deve retornar o agendamento com o status modificado", async () => {
+        let id = '';
+        await mockPost(1);
+        await request(app)
+            .get("/api/agendamentos")
+            .then(response => {
+                id = response.body.agendamentos["13/04/2023 01:00"][0].id})
+        await request(app)
+            .patch("/api/agendamentos/" + id)
+            .send({status: true})
+            .expect(200)
+            .then(response => {
+                expect(response.body.mensagem).toEqual("Status atualizado");
+                expect(response.body.agendamento).toEqual(
+                    {"dataAgendada": "13/04/2023",
+                        "dataNascimento": "14/10/1998",
+                        "horaAgendada": "01:00",
+                        "id": id,
+                        "nome": "Peter Parker",
+                        "status": true},
+                );
+            })
+    })
 })
 
 async function mockPost(quantidade = 1) {
@@ -118,6 +244,7 @@ async function mockPost(quantidade = 1) {
         paciente.horaAgendada = moment(paciente.horaAgendada, 'HH:mm')
                                  .add(1, 'h')
                                  .format("HH:mm")
+
 
         await request(app)
             .post("/api/agendamentos")
