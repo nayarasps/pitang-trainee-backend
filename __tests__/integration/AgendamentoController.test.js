@@ -172,22 +172,30 @@ describe("GET /api/agendamentos", () => {
             .expect(200)
             .then(response => {
                 expect(response.body.mensagem).toEqual("Agendamentos listados com sucesso");
-                response.body.agendamentos[0].id = "1";
-                response.body.agendamentos[1].id = "2";
-                expect(response.body.agendamentos).toEqual([
-                    {"dataAgendada": "13/04/2023",
-                    "dataNascimento": "14/10/1998",
-                    "horaAgendada": "01:00",
-                    "id": "1",
-                    "nome": "Peter Parker",
-                    "status": false},
-                    {"dataAgendada": "13/04/2023",
-                        "dataNascimento": "14/10/1998",
-                        "horaAgendada": "02:00",
-                        "id": "2",
-                        "nome": "Peter Parker",
-                        "status": false},
-                ]);
+                response.body.agendamentos["13/04/2023 01:00"][0].id = "1";
+                response.body.agendamentos["13/04/2023 02:00"][0].id = "2";
+                expect(response.body.agendamentos).toEqual({
+                    "13/04/2023 01:00": [
+                        {
+                            "dataAgendada": "13/04/2023",
+                            "dataNascimento": "14/10/1998",
+                            "horaAgendada": "01:00",
+                            "id": "1",
+                            "nome": "Peter Parker",
+                            "status": false
+                        }
+                    ],
+                    "13/04/2023 02:00": [
+                        {
+                            "dataAgendada": "13/04/2023",
+                            "dataNascimento": "14/10/1998",
+                            "horaAgendada": "02:00",
+                            "id": "2",
+                            "nome": "Peter Parker",
+                            "status": false
+                        }
+                    ]
+                });
             })
     })
 })
@@ -211,7 +219,7 @@ describe("PATCH /api/agendamentos/:id", () => {
         await request(app)
             .get("/api/agendamentos")
             .then(response => {
-                id = response.body.agendamentos[0].id})
+                id = response.body.agendamentos["13/04/2023 01:00"][0].id})
         await request(app)
             .patch("/api/agendamentos/" + id)
             .send({status: true})

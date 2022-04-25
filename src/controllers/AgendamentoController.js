@@ -29,18 +29,15 @@ module.exports = class AgendamentoController {
         response.status(201).json({ mensagem: "Agendamento Completo", agendamento: paciente});
     }
 
+    // Retorna agendamentos agrupados por dia e hora do agendamento
     async listarAgendamentosPorDataHora(request, response) {
-
-        let agendamentosOrdenados = this.agendamentos.sort(function (a, b) {
-            const dataA = moment(a.dataAgendada + ' ' + a.horaAgendada, 'DD/MM/YYYY HH:mm').toDate()
-            const dataB = moment(b.dataAgendada + ' ' + b.horaAgendada, 'DD/MM/YYYY HH:mm').toDate()
-            return dataA > dataB ? 1 : -1;
-        });
+        const agendamentosOrdenados = this.#getAgendamentosOrdenados()
+        const mapAgendamentos =  AgendamentoController.#getMapAgendamentos(agendamentosOrdenados)
 
         if(this.agendamentos.length === 0) {
             return response.status(200).json({ mensagem: "Nenhum agendamento cadastrado"});
         }
-        return response.status(200).json({ mensagem: "Agendamentos listados com sucesso", agendamentos: agendamentosOrdenados });
+        return response.status(200).json({ mensagem: "Agendamentos listados com sucesso", agendamentos: mapAgendamentos });
     }
 
     async mudarStatusAgendamento(request, response) {
@@ -67,6 +64,28 @@ module.exports = class AgendamentoController {
     #getPacientesMesmaDataHora(dataAgendada, horaAgendada) {
         const pacientesPorDataAgendada = this.#getPacientesPorDataAgendada(dataAgendada);
         return pacientesPorDataAgendada.filter(paciente => paciente.horaAgendada === horaAgendada)
+    }
+
+    static #getMapAgendamentos(agendamentosArray) {
+        if (agendamentosArray.length === 0) {return ''}
+
+        return agendamentosArray.reduce((grupos, agendamento) => {
+            const key = agendamento.dataAgendada + " " + agendamento.horaAgendada;
+            if (!grupos[key]) {
+                grupos[key] = [];
+            }
+            grupos[key].push(agendamento);
+            return grupos;
+        }, {});
+    }
+
+    #getAgendamentosOrdenados() {
+        return this.agendamentos.sort(function (a, b) {
+            const dataA = moment(a.dataAgendada + ' ' + a.horaAgendada, 'DD/MM/YYYY HH:mm').toDate()
+            const dataB = moment(b.dataAgendada + ' ' + b.horaAgendada, 'DD/MM/YYYY HH:mm').toDate()
+            return dataA > dataB ? 1 : -1;
+        });
+
     }
 }
 
