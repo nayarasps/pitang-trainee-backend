@@ -53,7 +53,7 @@ module.exports = class AgendamentoController {
 
         agendamento.status = novoStatus;
 
-        return response.status(201).json({mensagem: "Status atualizado", agendamento: agendamento });
+        return response.status(200).json({mensagem: "Status atualizado", agendamento: agendamento });
     }
 
 

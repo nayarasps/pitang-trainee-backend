@@ -223,7 +223,7 @@ describe("PATCH /api/agendamentos/:id", () => {
         await request(app)
             .patch("/api/agendamentos/" + id)
             .send({status: true})
-            .expect(201)
+            .expect(200)
             .then(response => {
                 expect(response.body.mensagem).toEqual("Status atualizado");
                 expect(response.body.agendamento).toEqual(
