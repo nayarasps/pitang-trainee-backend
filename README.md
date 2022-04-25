@@ -1,6 +1,6 @@
 # Pitang Trainee - Backend
 
-Projeto final para 
+Projeto final
 
 Diante do cenário atual, existe uma demanda gigante de pessoas para tomar a vacina para
 o COVID-19. E com isso nossa cidade está precisando de um simples sistema para realizar
